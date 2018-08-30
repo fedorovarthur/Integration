@@ -52,9 +52,7 @@ class Integration():
         ym = self.f_(xm)
         
         area12 = (x2 - x1)*(y1 + y2)/2
-        area1m = (xm - x1)*(y1 + ym)/2
-        aream2 = (x2 - xm)*(ym + y2)/2
-        area1m2 = area1m + aream2
+        area1m2 = ((xm - x1)*(y1 + ym) + (x2 - xm)*(ym + y2))/2
         
         #TODO: add error term as hyperparameter
         if abs((area1m2 - area12)/area12) < 10e-4:
@@ -70,6 +68,12 @@ class Integration():
         
     def solve(self):
         if self.method_ in ['rectangle', 'trapezoid', 'adaptive', 'monte-carlo']:
+
+            try:
+                assert self.area == .0
+            except:
+                self.area = .0
+
             if self.method_ == 'rectangle':
                 return self._rectangleMethod()
             elif self.method_ == 'trapezoid':
@@ -78,5 +82,6 @@ class Integration():
                 return self._adaptiveMethod()
             else:
                 return self._monteCarloMethod()
+                
         else:
             raise ValueError('Unsupported method, try rectangle, trapezoid, adaptive or monte-carlo')
