@@ -1,8 +1,6 @@
-import random
-
 class Integration():
     
-    def __init__(self, f, a, b, numIntervals = 1000, method = 'adaptive'):
+    def __init__(self, numIntervals = 1000, method = 'adaptive'):
         '''
         Minimalistic class for function integration with four methods.
         
@@ -16,40 +14,36 @@ class Integration():
         Outputs:
         Double: area - area under the function
         '''
-        self.f_ = f
-        self.a_ = a
-        self.b_ = b
         self.numIntervals_ = numIntervals
         self.method_ = method
-        self._dX = (b - a)/numIntervals
         self.area = .0
     
-    def _rectangleMethod(self):
-        x = self.a_
+    def _rectangleMethod(self, f, a, dX):
+        x = a
         for i in range(self.numIntervals_):
-            self.area += self._dX*self.f_(x)
-            x += self._dX
+            self.area += dX*f(x)
+            x += dX
         return self.area
     
-    def _trapezoidMethod(self):
-        x = self.a_
+    def _trapezoidMethod(self, f, a, dX):
+        x = a
         for i in range(self.numIntervals_):
-            self.area += self._dX*(self.f_(x) + self.f_(x + self._dX))/2
-            x += self._dX
+            self.area += dX*(f(x) + f(x + dX))/2
+            x += dX
         return self.area
     
-    def _adaptiveMethod(self):
-        x = self.a_
+    def _adaptiveMethod(self, f, a, dX):
+        x = a
         for i in range(self.numIntervals_):
-            self.area += self._sliceArea(x, x + self._dX)
-            x += self._dX
+            self.area += self._sliceArea(f, x, x + dX)
+            x += dX
         return self.area
         
-    def _sliceArea(self, x1, x2):
-        y1 = self.f_(x1)
-        y2 = self.f_(x2)
+    def _sliceArea(self, f, x1, x2):
+        y1 = f(x1)
+        y2 = f(x2)
         xm = (x1 + x2)/2
-        ym = self.f_(xm)
+        ym = f(xm)
         
         area12 = (x2 - x1)*(y1 + y2)/2
         area1m2 = ((xm - x1)*(y1 + ym) + (x2 - xm)*(ym + y2))/2
@@ -60,28 +54,34 @@ class Integration():
         else:
             return self._sliceArea(x1, xm) + self._sliceArea(xm, x2)
     
-    def _monteCarloMethod(self):
+    def _monteCarloMethod(self, f, a, b, dX):
+        from random import uniform
         #TODO: add random seed as hyperparameter
         for iter in range(self.numIntervals_):
-            self.area += self._dX*self.f_(random.uniform(self.a_, self.b_))
+            self.area += dX*f(uniform(a, b))
         return self.area
         
-    def solve(self):
+    def solve(self, f, a, b):
         if self.method_ in ['rectangle', 'trapezoid', 'adaptive', 'monte-carlo']:
 
             try:
                 assert self.area == .0
             except:
                 self.area = .0
+                
+            self.f_ = f
+            self.a_ = a
+            self.b_ = b
+            self._dX = (self.b_ - self.a_)/self.numIntervals_
 
             if self.method_ == 'rectangle':
-                return self._rectangleMethod()
+                return self._rectangleMethod(self.f_, self.a_, self._dX)
             elif self.method_ == 'trapezoid':
-                return self._trapezoidMethod()
+                return self._trapezoidMethod(self.f_, self.a_, self._dX)
             elif self.method_ == 'adaptive':
-                return self._adaptiveMethod()
+                return self._adaptiveMethod(self.f_, self.a_, self._dX)
             else:
-                return self._monteCarloMethod()
+                return self._monteCarloMethod(self.f_, self.a_, self.b_, self._dX)
                 
         else:
             raise ValueError('Unsupported method, try rectangle, trapezoid, adaptive or monte-carlo')
