@@ -17,3 +17,4 @@ class BaseIntegrator(BaseEstimator):
     def fit(self, a, b):
         self.dx_ = (b - a)/self.n_intervals
         self.method_ = self._find_method(self.method)
+        self.area_ = 0

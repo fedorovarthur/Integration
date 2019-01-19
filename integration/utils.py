@@ -11,7 +11,8 @@ class recursion(object):
 
     def __call__(self, *args, **kwargs):
         result = self.func(*args, **kwargs)
-        while callable(result): result = result()
+        while callable(result):
+            result = result()
         return result
 
     def call(self, *args, **kwargs):
@@ -27,6 +28,7 @@ def recursive_adaptation(f, x1, x2):
     area12 = (x2 - x1) * (y1 + y2) / 2
     area1m2 = ((xm - x1) * (y1 + ym) + (x2 - xm) * (ym + y2)) / 2
 
+    # TODO: Add error term as hyperparameter
     if abs((area1m2 - area12) / area12) < 10e-8:
         return area1m2
     else:
