@@ -15,6 +15,6 @@ class BaseIntegrator(BaseEstimator):
         return methods_slice[method]
 
     def fit(self, a: int, b: int):
-        self.dx_ = (b - a)/self.n_intervals
+        self.dx_ = (b - a) / self.n_intervals
         self.method_ = self._find_method(self.method)
         self.area_ = 0
